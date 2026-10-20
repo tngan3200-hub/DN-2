@@ -1,0 +1,1171 @@
+<!DOCTYPE html>
+<html lang="vi" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Truy Tìm Kho Báu Phân Số - Toán Lớp 4</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Nunito', 'sans-serif'],
+                        display: ['Fredoka', 'sans-serif'],
+                    },
+                    colors: {
+                        forest: {
+                            50: '#f2fcf4',
+                            100: '#e1f7e5',
+                            500: '#2e8b57',
+                            600: '#226b43',
+                            700: '#1b5435',
+                            800: '#144028',
+                        },
+                        treasure: {
+                            gold: '#ffd700',
+                            amber: '#ffb700',
+                            dark: '#8b4513',
+                            wood: '#a0522d'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .wood-pattern {
+            background-color: #8B4513;
+            background-image: radial-gradient(rgba(255,255,255,0.1) 15%, transparent 16%), radial-gradient(rgba(0,0,0,0.1) 15%, transparent 16%);
+            background-size: 60px 60px;
+            background-position: 0 0, 30px 30px;
+        }
+        .parchment {
+            background: #fffdf0;
+            border: 3px solid #d4a373;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+        /* Custom fraction styling */
+        .math-fraction {
+            display: inline-flex;
+            flex-direction: column;
+            vertical-align: middle;
+            text-align: center;
+            margin: 0 2px;
+            font-weight: 700;
+            color: #1b5435;
+        }
+        .math-fraction .numerator {
+            border-bottom: 2px solid #1b5435;
+            padding: 0 4px;
+        }
+        .math-fraction .denominator {
+            padding: 0 4px;
+        }
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #2e8b57;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="h-full bg-gradient-to-br from-forest-800 via-forest-600 to-emerald-900 font-sans text-slate-800 antialiased selection:bg-treasure-gold selection:text-forest-900">
+
+    <div id="app" class="min-h-full flex flex-col justify-between">
+        <!-- Header -->
+        <header class="bg-forest-900/90 backdrop-blur-md border-b border-forest-700/50 text-white shadow-lg sticky top-0 z-50">
+            <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap justify-between items-center">
+                <div class="flex items-center space-x-3 cursor-pointer" onclick="appController.goHome()">
+                    <div class="bg-gradient-to-tr from-amber-500 to-treasure-gold p-2.5 rounded-2xl shadow-md text-forest-900 font-bold text-xl flex items-center justify-center transform hover:scale-105 transition">
+                        <i class="fa-solid fa-map-treasure-chest text-2xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="font-display font-bold text-lg md:text-xl tracking-wide text-treasure-gold drop-shadow">Truy Tìm Kho Báu Phân Số</h1>
+                        <p class="text-xs text-emerald-200">Toán Lớp 4 • Bộ sách Kết nối tri thức với cuộc sống</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center space-x-3 mt-2 sm:mt-0">
+                    <div id="student-info-badge" class="hidden bg-forest-800 px-3 py-1.5 rounded-xl border border-forest-600 text-xs md:text-sm flex items-center space-x-2">
+                        <i class="fa-solid fa-user-graduate text-treasure-gold"></i>
+                        <span id="nav-student-name" class="font-semibold text-white"></span>
+                        <span class="text-emerald-300 px-1.5 py-0.5 bg-forest-700 rounded text-xs" id="nav-student-class"></span>
+                    </div>
+                    <button onclick="appController.openTeacherLoginModal()" class="bg-amber-600 hover:bg-amber-700 text-white font-semibold px-3 py-2 rounded-xl text-xs md:text-sm shadow flex items-center space-x-2 transition transform hover:scale-105">
+                        <i class="fa-solid fa-chalkboard-user"></i>
+                        <span>Khu Vực Giáo Viên</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <main class="flex-grow max-w-6xl w-full mx-auto p-4 md:p-6 flex flex-col items-center justify-center">
+            
+            <!-- VIEW 1: WELCOME SCREEN / REGISTRATION -->
+            <div id="view-welcome" class="w-full max-w-xl parchment rounded-3xl p-6 md:p-8 relative overflow-hidden transition-all duration-300">
+                <div class="absolute -right-10 -bottom-10 opacity-10 pointer-events-none">
+                    <i class="fa-solid fa-coins text-9xl text-amber-700"></i>
+                </div>
+                
+                <div class="text-center mb-6">
+                    <span class="bg-amber-100 text-amber-800 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider inline-block mb-3 border border-amber-300">
+                        Bài 58 • Trang 64
+                    </span>
+                    <h2 class="font-display font-bold text-2xl md:text-3xl text-forest-800 mb-2">Cuộc Phiêu Lưu Vượt 5 Cánh Cửa</h2>
+                    <p class="text-slate-600 text-sm md:text-base">Hãy giúp nhà thám hiểm nhí vượt qua các thử thách so sánh phân số chuẩn xác để mở rương kho báu cổ xưa!</p>
+                </div>
+
+                <form id="registration-form" onsubmit="appController.startAdventure(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-bold text-forest-800 mb-1 flex items-center space-x-2">
+                            <i class="fa-solid fa-user text-forest-600"></i>
+                            <span>Họ và tên học sinh:</span>
+                        </label>
+                        <input type="text" id="input-name" required placeholder="Ví dụ: Nguyễn Văn An" 
+                            class="w-full px-4 py-3 rounded-xl border-2 border-amber-200 focus:border-forest-500 focus:outline-none bg-white font-medium text-slate-800 shadow-sm">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-bold text-forest-800 mb-1 flex items-center space-x-2">
+                            <i class="fa-solid fa-school text-forest-600"></i>
+                            <span>Lớp (Ví dụ: 4A, 4B...):</span>
+                        </label>
+                        <input type="text" id="input-class" required placeholder="Ví dụ: 4A1" 
+                            class="w-full px-4 py-3 rounded-xl border-2 border-amber-200 focus:border-forest-500 focus:outline-none bg-white font-medium text-slate-800 shadow-sm">
+                    </div>
+
+                    <div class="pt-3">
+                        <button type="submit" class="w-full bg-gradient-to-r from-forest-600 to-emerald-600 hover:from-forest-700 hover:to-emerald-700 text-white font-display font-bold py-3.5 px-6 rounded-2xl shadow-lg transform hover:-translate-y-0.5 transition flex items-center justify-center space-x-3 text-lg">
+                            <i class="fa-solid fa-compass text-treasure-gold"></i>
+                            <span>BẮT ĐẦU HÀNH TRÌNH KHÁM PHÁ</span>
+                        </button>
+                    </div>
+                </form>
+
+                <div class="mt-6 pt-4 border-t border-amber-200/60 text-center text-xs text-slate-500">
+                    <p><i class="fa-solid fa-shield-halved text-forest-600 mr-1"></i> Hệ thống tự động ghi nhận điểm số, tiến độ và thời gian hoàn thành cho giáo viên.</p>
+                </div>
+            </div>
+
+            <!-- VIEW 2: MAP / DOOR SELECTION -->
+            <div id="view-map" class="w-full max-w-4xl hidden animate-fadeIn">
+                <div class="bg-white/95 backdrop-blur rounded-3xl p-6 md:p-8 shadow-2xl border-4 border-amber-200">
+                    <div class="flex flex-col md:flex-row justify-between items-center mb-6 pb-4 border-b border-slate-200 gap-4">
+                        <div>
+                            <span class="text-xs font-bold text-emerald-600 uppercase tracking-widest bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">Bản đồ thử thách</span>
+                            <h2 class="font-display font-bold text-2xl text-forest-800 mt-1">Xin chào, <span id="display-student-name" class="text-amber-600"></span>!</h2>
+                            <p class="text-slate-600 text-sm">Chọn cánh cửa thử thách tiếp theo để tiếp tục hành trình tìm kho báu.</p>
+                        </div>
+                        <div class="flex items-center space-x-4 bg-amber-50 px-4 py-2.5 rounded-2xl border border-amber-200 shadow-inner">
+                            <div class="text-center">
+                                <span class="block text-xs text-slate-500 font-semibold">Tổng điểm</span>
+                                <span id="display-total-score" class="font-display font-bold text-xl text-amber-600">0</span>
+                            </div>
+                            <div class="h-8 w-px bg-amber-200"></div>
+                            <div class="text-center">
+                                <span class="block text-xs text-slate-500 font-semibold">Đã hoàn thành</span>
+                                <span id="display-completed-count" class="font-display font-bold text-xl text-forest-600">0/5</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Doors Grid / Map Path -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 my-6" id="doors-container">
+                        <!-- Populated dynamically -->
+                    </div>
+
+                    <div id="final-treasure-banner" class="hidden mt-6 p-6 bg-gradient-to-r from-amber-500 to-treasure-gold rounded-2xl shadow-xl text-center text-forest-900 animate-bounce">
+                        <i class="fa-solid fa-gem text-4xl mb-2"></i>
+                        <h3 class="font-display font-bold text-2xl">Đã mở khóa toàn bộ 5 cánh cửa!</h3>
+                        <p class="text-sm font-semibold mb-4">Kho báu phân số huyền thoại đang chờ bạn mở rương nhận thưởng.</p>
+                        <button onclick="appController.openFinalTreasure()" class="bg-forest-900 hover:bg-forest-800 text-treasure-gold font-display font-bold px-6 py-3 rounded-xl shadow-lg text-lg transform hover:scale-105 transition">
+                            <i class="fa-solid fa-key mr-2"></i> MỞ RƯƠNG KHO BÁU NGAY!
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW 3: CHALLENGE / DOOR GAMEPLAY -->
+            <div id="view-challenge" class="w-full max-w-3xl hidden animate-fadeIn">
+                <div class="bg-white rounded-3xl p-6 md:p-8 shadow-2xl border-4 border-amber-200 relative">
+                    <!-- Top Bar of Challenge -->
+                    <div class="flex justify-between items-center mb-6 pb-3 border-b border-slate-100">
+                        <button onclick="appController.returnToMap()" class="text-slate-500 hover:text-forest-700 font-semibold text-sm flex items-center space-x-1 bg-slate-100 px-3 py-1.5 rounded-xl transition">
+                            <i class="fa-solid fa-arrow-left"></i>
+                            <span>Trở về bản đồ</span>
+                        </button>
+                        <div class="flex items-center space-x-2">
+                            <span id="challenge-badge" class="bg-emerald-100 text-emerald-800 text-xs font-bold px-3 py-1 rounded-full border border-emerald-200"></span>
+                            <span class="text-xs text-slate-500 font-medium">Thời gian: <span id="challenge-timer" class="font-bold text-slate-700">00:00</span></span>
+                        </div>
+                    </div>
+
+                    <!-- Story & Prompt -->
+                    <div class="mb-6 bg-emerald-50/70 border border-emerald-200 rounded-2xl p-4 md:p-5">
+                        <div class="flex items-start space-x-3">
+                            <div class="bg-emerald-600 text-white p-2.5 rounded-xl shadow-md mt-0.5">
+                                <i class="fa-solid fa-scroll text-lg"></i>
+                            </div>
+                            <div>
+                                <h3 id="challenge-title" class="font-display font-bold text-lg text-forest-800 mb-1"></h3>
+                                <p id="challenge-lore" class="text-slate-700 text-sm md:text-base leading-relaxed"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Question Container -->
+                    <div id="question-container" class="space-y-6">
+                        <!-- Dynamically loaded question item -->
+                    </div>
+
+                    <!-- Feedback & Hint Box -->
+                    <div id="feedback-box" class="hidden mt-6 p-4 rounded-2xl text-sm transition-all duration-300"></div>
+
+                    <!-- Action Buttons -->
+                    <div class="mt-8 flex justify-end space-x-3">
+                        <button id="btn-hint" onclick="appController.showHint()" class="hidden bg-amber-100 hover:bg-amber-200 text-amber-800 font-bold px-4 py-2.5 rounded-xl text-sm flex items-center space-x-2 transition">
+                            <i class="fa-solid fa-lightbulb text-amber-500"></i>
+                            <span>Xem gợi ý</span>
+                        </button>
+                        <button id="btn-submit" onclick="appController.submitAnswer()" class="bg-forest-600 hover:bg-forest-700 text-white font-display font-bold px-6 py-2.5 rounded-xl shadow-lg transition flex items-center space-x-2">
+                            <span>Nộp câu trả lời</span>
+                            <i class="fa-solid fa-check"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW 4: TREASURE CELEBRATION -->
+            <div id="view-celebration" class="w-full max-w-2xl hidden text-center animate-fadeIn">
+                <div class="bg-white/95 backdrop-blur rounded-3xl p-8 shadow-2xl border-4 border-treasure-gold relative overflow-hidden">
+                    <div class="absolute inset-0 bg-gradient-to-t from-amber-100/50 to-transparent pointer-events-none"></div>
+                    
+                    <div class="relative z-10">
+                        <div class="w-24 h-24 mx-auto bg-gradient-to-tr from-amber-500 to-treasure-gold rounded-full flex items-center justify-center shadow-xl text-forest-900 text-5xl mb-4 animate-bounce">
+                            <i class="fa-solid fa-award"></i>
+                        </div>
+
+                        <h2 class="font-display font-bold text-2xl md:text-3xl text-forest-800 mb-2">CHÚC MỪNG NHÀ THÁM HIỂM ĐÃ TÌM THẤY KHO BÁU PHÂN SỐ!</h2>
+                        <p class="text-slate-600 text-sm md:text-base mb-6">Bạn đã xuất sắc vượt qua toàn bộ 5 cánh cửa thử thách của Bài 58.</p>
+
+                        <!-- Stats Summary Card -->
+                        <div class="bg-emerald-50 rounded-2xl p-5 border border-emerald-200 mb-6 max-w-md mx-auto grid grid-cols-2 gap-4 text-left">
+                            <div>
+                                <span class="block text-xs text-slate-500 font-semibold">Tổng điểm đạt được</span>
+                                <span id="celeb-score" class="font-display font-bold text-2xl text-amber-600">0</span>
+                            </div>
+                            <div>
+                                <span class="block text-xs text-slate-500 font-semibold">Thời gian hoàn thành</span>
+                                <span id="celeb-time" class="font-display font-bold text-xl text-forest-800">00:00</span>
+                            </div>
+                            <div>
+                                <span class="block text-xs text-slate-500 font-semibold">Số lần dùng gợi ý</span>
+                                <span id="celeb-hints" class="font-display font-bold text-lg text-slate-700">0</span>
+                            </div>
+                            <div>
+                                <span class="block text-xs text-slate-500 font-semibold">Số lần trả lời sai</span>
+                                <span id="celeb-errors" class="font-display font-bold text-lg text-slate-700">0</span>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col sm:flex-row justify-center gap-3">
+                            <button onclick="appController.goHome()" class="bg-forest-600 hover:bg-forest-700 text-white font-display font-bold px-6 py-3 rounded-xl shadow-lg transition flex items-center justify-center space-x-2">
+                                <i class="fa-solid fa-rotate-right"></i>
+                               <span>Chơi lại từ đầu</span>
+                            </button>
+                            <button onclick="appController.openTeacherLoginModal()" class="bg-amber-600 hover:bg-amber-700 text-white font-display font-bold px-6 py-3 rounded-xl shadow-lg transition flex items-center justify-center space-x-2">
+                                <i class="fa-solid fa-chart-column"></i>
+                                <span>Xem kết quả của lớp</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+
+        <!-- Footer -->
+        <footer class="bg-forest-900 text-emerald-300 text-xs py-4 text-center border-t border-forest-800">
+            <p>Trò chơi giáo dục tương tác • Bài 58: So sánh phân số • Sách Kết nối tri thức với cuộc sống lớp 4</p>
+        </footer>
+    </div>
+
+    <!-- TEACHER LOGIN MODAL -->
+    <div id="modal-teacher-login" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden animate-fadeIn">
+        <div class="bg-white rounded-3xl p-6 md:p-8 max-w-md w-full shadow-2xl border-4 border-amber-500 relative">
+            <button onclick="appController.closeTeacherLoginModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 text-xl font-bold">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <div class="text-center mb-6">
+                <div class="w-14 h-14 bg-amber-100 text-amber-700 rounded-2xl mx-auto flex items-center justify-center text-2xl mb-3 shadow-inner">
+                    <i class="fa-solid fa-lock"></i>
+                </div>
+                <h3 class="font-display font-bold text-xl text-forest-800">Khu Vực Quản Lý Giáo Viên</h3>
+                <p class="text-slate-500 text-xs mt-1">Nhập mật khẩu để truy cập bảng điều khiển và kết quả học sinh.</p>
+            </div>
+
+            <form onsubmit="appController.verifyTeacherPassword(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Mật khẩu giáo viên:</label>
+                    <input type="password" id="teacher-password-input" required placeholder="Nhập mật khẩu (Mặc định: 123456)" 
+                        class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:border-amber-500 focus:outline-none text-sm">
+                    <p class="text-[11px] text-slate-400 mt-1">Mật khẩu mặc định trong hệ thống: <code class="bg-slate-100 px-1 py-0.5 rounded text-slate-600 font-bold">123456</code></p>
+                </div>
+                <div id="teacher-login-error" class="hidden text-red-600 text-xs font-semibold"></div>
+
+                <button type="submit" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-display font-bold py-3 rounded-xl shadow transition flex items-center justify-center space-x-2">
+                    <span>Đăng nhập quản lý</span>
+                    <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- TEACHER DASHBOARD VIEW -->
+    <div id="view-teacher-dashboard" class="fixed inset-0 bg-slate-900 z-50 hidden flex flex-col overflow-hidden animate-fadeIn">
+        <!-- Dashboard Header -->
+        <header class="bg-forest-900 border-b border-forest-700 text-white px-6 py-4 flex justify-between items-center shadow-md">
+            <div class="flex items-center space-x-3">
+                <div class="bg-amber-500 p-2 rounded-xl text-forest-900 font-bold">
+                    <i class="fa-solid fa-chalkboard-user text-xl"></i>
+                </div>
+                <div>
+                    <h2 class="font-display font-bold text-lg text-amber-400">Bảng Quản Lý Giáo Viên - Truy Tìm Kho Báu Phân Số</h2>
+                    <p class="text-xs text-emerald-300">Theo dõi tiến độ, xem kết quả chi tiết và xuất báo cáo học tập</p>
+                </div>
+            </div>
+            <button onclick="appController.closeTeacherDashboard()" class="bg-forest-800 hover:bg-forest-700 text-white px-4 py-2 rounded-xl text-sm font-semibold flex items-center space-x-2 transition border border-forest-600">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <span>Thoát Quản Lý</span>
+            </button>
+        </header>
+
+        <!-- Dashboard Content -->
+        <div class="flex-grow overflow-y-auto p-4 md:p-6 bg-slate-100 space-y-6">
+            
+            <!-- Statistics Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center space-x-4">
+                    <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center text-xl font-bold">
+                        <i class="fa-solid fa-users"></i>
+                    </div>
+                    <div>
+                        <span class="text-xs text-slate-500 font-semibold">Tổng số học sinh tham gia</span>
+                        <h3 id="stat-total-students" class="font-display font-bold text-2xl text-slate-800">0</h3>
+                    </div>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center space-x-4">
+                    <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center text-xl font-bold">
+                        <i class="fa-solid fa-circle-check"></i>
+                    </div>
+                    <div>
+                        <span class="text-xs text-slate-500 font-semibold">Đã hoàn thành 5 cửa</span>
+                        <h3 id="stat-completed-students" class="font-display font-bold text-2xl text-slate-800">0</h3>
+                    </div>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center space-x-4">
+                    <div class="w-12 h-12 bg-amber-100 text-amber-600 rounded-2xl flex items-center justify-center text-xl font-bold">
+                        <i class="fa-solid fa-star"></i>
+                    </div>
+                    <div>
+                        <span class="text-xs text-slate-500 font-semibold">Điểm trung bình (thang 100)</span>
+                        <h3 id="stat-avg-score" class="font-display font-bold text-2xl text-slate-800">0</h3>
+                    </div>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center space-x-4">
+                    <div class="w-12 h-12 bg-purple-100 text-purple-600 rounded-2xl flex items-center justify-center text-xl font-bold">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                    </div>
+                    <div>
+                        <span class="text-xs text-slate-500 font-semibold">Cửa thử thách khó nhất</span>
+                        <h3 id="stat-hardest-door" class="font-display font-bold text-lg text-slate-800 truncate max-w-[160px]">Cửa 2</h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Toolbar & Filters -->
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 flex flex-wrap justify-between items-center gap-4">
+                <div class="flex flex-wrap items-center gap-3 w-full md:w-auto">
+                    <div class="relative flex-grow md:w-64">
+                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </span>
+                        <input type="text" id="teacher-search" oninput="teacherDashboard.filterData()" placeholder="Tìm theo tên học sinh..." 
+                            class="w-full pl-9 pr-4 py-2 rounded-xl border border-slate-300 focus:border-forest-500 focus:outline-none text-sm">
+                    </div>
+
+                    <select id="teacher-filter-class" onchange="teacherDashboard.filterData()" class="py-2 px-3 rounded-xl border border-slate-300 focus:border-forest-500 focus:outline-none text-sm bg-white">
+                        <option value="">Tất cả các lớp</option>
+                    </select>
+
+                    <select id="teacher-filter-status" onchange="teacherDashboard.filterData()" class="py-2 px-3 rounded-xl border border-slate-300 focus:border-forest-500 focus:outline-none text-sm bg-white">
+                        <option value="">Tất cả trạng thái</option>
+                        <option value="completed">Đã hoàn thành (5/5)</option>
+                        <option value="in-progress">Đang thử thách</option>
+                    </select>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-2">
+                    <button onclick="teacherDashboard.exportCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl text-sm font-semibold flex items-center space-x-2 transition shadow">
+                        <i class="fa-solid fa-file-csv"></i>
+                        <span>Xuất CSV</span>
+                    </button>
+                    <button onclick="teacherDashboard.clearDataConfirm()" class="bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 px-4 py-2 rounded-xl text-sm font-semibold flex items-center space-x-2 transition">
+                        <i class="fa-solid fa-trash-can"></i>
+                        <span>Xóa dữ liệu</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Results Table -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-50 border-b border-slate-200 text-slate-700 font-bold text-xs uppercase tracking-wider">
+                                <th class="p-4 cursor-pointer hover:bg-slate-100" onclick="teacherDashboard.sortData('name')">Họ và tên <i class="fa-solid fa-sort ml-1"></i></th>
+                                <th class="p-4 cursor-pointer hover:bg-slate-100" onclick="teacherDashboard.sortData('className')">Lớp <i class="fa-solid fa-sort ml-1"></i></th>
+                                <th class="p-4 text-center cursor-pointer hover:bg-slate-100" onclick="teacherDashboard.sortData('score')">Tổng điểm <i class="fa-solid fa-sort ml-1"></i></th>
+                                <th class="p-4 text-center">Cửa hoàn thành</th>
+                                <th class="p-4 text-center">Gợi ý / Sai</th>
+                                <th class="p-4 text-center cursor-pointer hover:bg-slate-100" onclick="teacherDashboard.sortData('time')">Thời gian <i class="fa-solid fa-sort ml-1"></i></th>
+                                <th class="p-4 text-center">Trạng thái</th>
+                                <th class="p-4 text-center">Chi tiết</th>
+                            </tr>
+                        </thead>
+                        <tbody id="teacher-table-body" class="divide-y divide-slate-100 text-sm">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+                <div id="teacher-empty-state" class="hidden p-12 text-center text-slate-400">
+                    <i class="fa-solid fa-folder-open text-4xl mb-2"></i>
+                    <p>Chưa có dữ liệu học sinh nào trong hệ thống.</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- STUDENT DETAIL MODAL FOR TEACHER -->
+    <div id="modal-student-detail" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4 animate-fadeIn">
+        <div class="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl border border-slate-200 relative overflow-hidden">
+            <div class="bg-forest-900 text-white px-6 py-4 flex justify-between items-center">
+                <div>
+                    <h3 id="detail-modal-title" class="font-display font-bold text-lg text-amber-400">Chi tiết bài làm học sinh</h3>
+                    <p id="detail-modal-subtitle" class="text-xs text-emerald-300"></p>
+                </div>
+                <button onclick="teacherDashboard.closeStudentDetail()" class="text-slate-300 hover:text-white text-xl font-bold">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div id="detail-modal-content" class="p-6 overflow-y-auto space-y-4 flex-grow">
+                <!-- Dynamically populated detail logs -->
+            </div>
+
+            <div class="bg-slate-50 px-6 py-3 border-t border-slate-200 flex justify-end">
+                <button onclick="teacherDashboard.closeStudentDetail()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold px-4 py-2 rounded-xl text-sm transition">
+                    Đóng
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPT APPLICATION CONTROLLER -->
+    <script>
+        const GAME_CONFIG = {
+            doors: [
+                {
+                    id: 1,
+                    title: "Cánh Cửa 1: Cùng Mẫu Số",
+                    badge: "Thử thách 1",
+                    lore: "Bạn đứng trước Cánh cửa rêu phong số 1. Trên cánh cửa khắc dòng chữ cổ: 'Muốn qua cửa này, hãy nắm vững quy tắc so sánh hai phân số cùng mẫu số'.",
+                    question: {
+                        type: "multiple",
+                        prompt: "So sánh hai phân số {3/7} và {5/7}. Dấu thích hợp điền vào ô trống là gì?",
+                        expression: "3/7 ... 5/7",
+                        options: [
+                            { id: "A", text: "{3/7} > {5/7}", value: ">" },
+                            { id: "B", text: "{3/7} = {5/7}", value: "=" },
+                            { id: "C", text: "{3/7} < {5/7}", value: "<" }
+                        ],
+                        correct: "C",
+                        hint: "Trong hai phân số có cùng mẫu số (mẫu số dương), phân số nào có tử số bé hơn thì bé hơn.",
+                        explanation: "Vì hai phân số có cùng mẫu số là 7, mà tử số 3 < 5 nên {3/7} < {5/7}."
+                    },
+                    points: 20
+                },
+                {
+                    id: 2,
+                    title: "Cánh Cửa 2: Khác Mẫu Số",
+                    badge: "Thử thách 2",
+                    lore: "Cánh cửa thứ hai được khóa bằng một cơ chế tinh xảo đòi hỏi quy đồng mẫu số. Hãy cẩn thận tính toán!",
+                    question: {
+                        type: "multiple",
+                        prompt: "So sánh hai phân số {2/3} và {3/4}. Kết quả đúng là:",
+                        expression: "2/3 ... 3/4",
+                        options: [
+                            { id: "A", text: "{2/3} < {3/4}", value: "<" },
+                            { id: "B", text: "{2/3} > {3/4}", value: ">" },
+                            { id: "C", text: "{2/3} = {3/4}", value: "=" }
+                        ],
+                        correct: "A",
+                        hint: "Quy đồng mẫu số hai phân số với mẫu số chung là 12: {2/3} = {8/12} và {3/4} = {9/12}. Sau đó so sánh hai tử số.",
+                        explanation: "Quy đồng ta có {2/3} = {8/12} và {3/4} = {9/12}. Vì 8 < 9 nên {8/12} < {9/12}, vậy {2/3} < {3/4}."
+                    },
+                    points: 20
+                },
+                {
+                    id: 3,
+                    title: "Cánh Cửa 3: So Sánh Với 1",
+                    badge: "Thử thách 3",
+                    lore: "Cánh cửa thứ ba tỏa ánh sáng huyền ảo. Trên cửa có khắc câu đố về việc so sánh phân số với số 1.",
+                    question: {
+                        type: "multiple",
+                        prompt: "Chọn phát biểu đúng khi so sánh phân số {9/7} với 1:",
+                        expression: "9/7 ... 1",
+                        options: [
+                            { id: "A", text: "{9/7} = 1", value: "=" },
+                            { id: "B", text: "{9/7} < 1", value: "<" },
+                            { id: "C", text: "{9/7} > 1", value: ">" }
+                        ],
+                        correct: "C",
+                        hint: "Phân số có tử số lớn hơn mẫu số thì phân số đó lớn hơn 1.",
+                        explanation: "Vì tử số 9 lớn hơn mẫu số 7 (9 > 7), nên phân số {9/7} > 1."
+                    },
+                    points: 20
+                },
+                {
+                    id: 4,
+                    title: "Cánh Cửa 4: Tổng Hợp Kỹ Năng",
+                    badge: "Thử thách 4",
+                    lore: "Cánh cửa thứ tư thử thách toàn diện khả năng phân tích và sắp xếp các phân số từ bé đến lớn.",
+                    question: {
+                        type: "multiple",
+                        prompt: "Sắp xếp các phân số sau theo thứ tự từ bé đến lớn: {3/4}; {1/2}; {5/8}",
+                        expression: "3/4, 1/2, 5/8",
+                        options: [
+                            { id: "A", text: "{1/2}, {3/4}, {5/8}", value: "1/2, 3/4, 5/8" },
+                            { id: "B", text: "{1/2}, {5/8}, {3/4}", value: "1/2, 5/8, 3/4" },
+                            { id: "C", text: "{3/4}, {5/8}, {1/2}", value: "3/4, 5/8, 1/2" }
+                        ],
+                        correct: "B",
+                        hint: "Quy đồng mẫu số chung là 8: {1/2} = {4/8}; {3/4} = {6/8}; còn {5/8} giữ nguyên. So sánh các tử số 4, 5, 6.",
+                        explanation: "Quy đồng mẫu số chung là 8: {1/2} = {4/8}, {3/4} = {6/8}, giữ nguyên {5/8}. Vì 4 < 5 < 6 nên thứ tự từ bé đến lớn là {1/2}, {5/8}, {3/4}."
+                    },
+                    points: 20
+                },
+                {
+                    id: 5,
+                    title: "Cánh Cửa 5: Vận Dụng Thực Tiễn",
+                    badge: "Thử thách cuối",
+                    lore: "Cánh cửa cuối cùng bảo vệ rương kho báu! Một bài toán thực tế đang chờ nhà thám hiểm giải quyết.",
+                    question: {
+                        type: "multiple",
+                        prompt: "Bình ăn {3/8} cái bánh, An ăn {1/2} cái bánh cùng loại. Hỏi ai ăn nhiều bánh hơn?",
+                        expression: "Binh vs An",
+                        options: [
+                            { id: "A", text: "An ăn nhiều hơn", value: "An" },
+                            { id: "B", text: "Bình ăn nhiều hơn", value: "Bình" },
+                            { id: "C", text: "Hai bạn ăn bằng nhau", value: "Bằng nhau" }
+                        ],
+                        correct: "A",
+                        hint: "Quy đồng phân số {1/2} về mẫu số 8 để so sánh với {3/8}. Ta có {1/2} = {4/8}.",
+                        explanation: "Ta quy đồng {1/2} = {4/8}. So sánh với {3/8}, vì {4/8} > {3/8} nên An ăn nhiều bánh hơn Bình."
+                    },
+                    points: 20
+                }
+            ]
+        };
+
+        class GameController {
+            constructor() {
+                this.state = {
+                    studentName: '',
+                    studentClass: '',
+                    currentDoorId: null,
+                    scores: {}, 
+                    attempts: {}, 
+                    hintsUsed: {}, 
+                    completedDoors: [],
+                    startTime: null,
+                    elapsedSeconds: 0,
+                    timerInterval: null,
+                    doorLogs: {} 
+                };
+            }
+
+            init() {
+                this.showWelcome();
+            }
+
+            startAdventure(e) {
+                e.preventDefault();
+                const nameInput = document.getElementById('input-name').value.trim();
+                const classInput = document.getElementById('input-class').value.trim();
+
+                if (!nameInput || !classInput) return;
+
+                this.state.studentName = nameInput;
+                this.state.studentClass = classInput;
+                this.state.startTime = Date.now();
+                this.state.completedDoors = [];
+                this.state.scores = {};
+                this.state.attempts = {};
+                this.state.hintsUsed = {};
+                this.state.doorLogs = {};
+                this.state.elapsedSeconds = 0;
+
+                if (this.state.timerInterval) clearInterval(this.state.timerInterval);
+                this.state.timerInterval = setInterval(() => {
+                    this.state.elapsedSeconds++;
+                    const minutes = Math.floor(this.state.elapsedSeconds / 60).toString().padStart(2, '0');
+                    const seconds = (this.state.elapsedSeconds % 60).toString().padStart(2, '0');
+                    const timerEl = document.getElementById('challenge-timer');
+                    if (timerEl) timerEl.innerText = `${minutes}:${seconds}`;
+                }, 1000);
+
+                document.getElementById('student-info-badge').classList.remove('hidden');
+                document.getElementById('nav-student-name').innerText = nameInput;
+                document.getElementById('nav-student-class').innerText = classInput;
+
+                this.showMap();
+            }
+
+            goHome() {
+                this.showWelcome();
+            }
+
+            showWelcome() {
+                this.hideAllViews();
+                document.getElementById('view-welcome').classList.remove('hidden');
+                document.getElementById('student-info-badge').classList.add('hidden');
+                if (this.state.timerInterval) clearInterval(this.state.timerInterval);
+            }
+
+            showMap() {
+                this.hideAllViews();
+                document.getElementById('view-map').classList.remove('hidden');
+                document.getElementById('display-student-name').innerText = this.state.studentName;
+                
+                const totalScore = Object.values(this.state.scores).reduce((a, b) => a + b, 0);
+                document.getElementById('display-total-score').innerText = totalScore;
+                document.getElementById('display-completed-count').innerText = `${this.state.completedDoors.length}/5`;
+
+                this.renderDoorsMap();
+            }
+
+            renderDoorsMap() {
+                const container = document.getElementById('doors-container');
+                container.innerHTML = '';
+
+                GAME_CONFIG.doors.forEach((door, index) => {
+                    const isCompleted = this.state.completedDoors.includes(door.id);
+                    const isUnlocked = index === 0 || this.state.completedDoors.includes(GAME_CONFIG.doors[index - 1].id);
+
+                    let cardClass = "border-2 rounded-2xl p-5 flex flex-col justify-between transition-all relative overflow-hidden ";
+                    let iconHtml = "";
+                    let actionHtml = "";
+
+                    if (isCompleted) {
+                        cardClass += "bg-emerald-50 border-emerald-300 text-emerald-900 shadow-md";
+                        iconHtml = `<div class="w-12 h-12 rounded-xl bg-emerald-600 text-white flex items-center justify-center text-xl mb-3 shadow"><i class="fa-solid fa-check"></i></div>`;
+                        actionHtml = `<span class="text-xs font-bold text-emerald-700 bg-emerald-100 py-1.5 px-3 rounded-lg text-center"><i class="fa-solid fa-star text-amber-500 mr-1"></i> Đã hoàn thành (${this.state.scores[door.id] || 20}đ)</span>`;
+                    } else if (isUnlocked) {
+                        cardClass += "bg-white border-amber-300 hover:border-forest-500 text-slate-800 shadow-lg cursor-pointer transform hover:-translate-y-1";
+                        iconHtml = `<div class="w-12 h-12 rounded-xl bg-amber-500 text-white flex items-center justify-center text-xl mb-3 shadow"><i class="fa-solid fa-door-open"></i></div>`;
+                        actionHtml = `<button onclick="appController.openDoor(${door.id})" class="w-full bg-forest-600 hover:bg-forest-700 text-white font-bold py-2 px-4 rounded-xl text-xs transition flex items-center justify-center space-x-1"><span>Vào thử thách</span><i class="fa-solid fa-arrow-right"></i></button>`;
+                    } else {
+                        cardClass += "bg-slate-100 border-slate-300 text-slate-400 opacity-75 cursor-not-allowed";
+                        iconHtml = `<div class="w-12 h-12 rounded-xl bg-slate-300 text-slate-500 flex items-center justify-center text-xl mb-3"><i class="fa-solid fa-lock"></i></div>`;
+                        actionHtml = `<span class="text-xs font-semibold text-slate-400 py-1.5 text-center block">Cần mở cửa trước</span>`;
+                    }
+
+                    const card = document.createElement('div');
+                    card.className = cardClass;
+                    if (isUnlocked && !isCompleted) {
+                        card.onclick = () => this.openDoor(door.id);
+                    }
+
+                    card.innerHTML = `
+                        <div>
+                            <div class="flex justify-between items-start mb-2">
+                                <span class="text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full ${isCompleted ? 'bg-emerald-200 text-emerald-800' : isUnlocked ? 'bg-amber-100 text-amber-800' : 'bg-slate-200 text-slate-600'}">Cửa ${door.id}</span>
+                                <span class="text-xs font-bold text-slate-400">20đ</span>
+                            </div>
+                            ${iconHtml}
+                            <h4 class="font-display font-bold text-base mb-1">${door.title.split(': ')[1]}</h4>
+                            <p class="text-xs text-slate-500 line-clamp-2">${door.lore}</p>
+                        </div>
+                        <div class="mt-4 pt-3 border-t border-slate-100">
+                            ${actionHtml}
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+
+                const finalBanner = document.getElementById('final-treasure-banner');
+                if (this.state.completedDoors.length === 5) {
+                    finalBanner.classList.remove('hidden');
+                } else {
+                    finalBanner.classList.add('hidden');
+                }
+            }
+
+            openDoor(doorId) {
+                this.state.currentDoorId = doorId;
+                const door = GAME_CONFIG.doors.find(d => d.id === doorId);
+                if (!door) return;
+
+                if (this.state.attempts[doorId] === undefined) {
+                    this.state.attempts[doorId] = 0;
+                }
+                if (this.state.hintsUsed[doorId] === undefined) {
+                    this.state.hintsUsed[doorId] = false;
+                }
+
+                this.hideAllViews();
+                document.getElementById('view-challenge').classList.remove('hidden');
+
+                document.getElementById('challenge-badge').innerText = door.badge;
+                document.getElementById('challenge-title').innerText = door.title;
+                document.getElementById('challenge-lore').innerText = door.lore;
+
+                const qContainer = document.getElementById('question-container');
+                qContainer.innerHTML = `
+                    <div class="bg-amber-50/50 p-5 rounded-2xl border border-amber-200">
+                        <p class="font-semibold text-slate-800 text-base md:text-lg mb-4">${this.formatFractions(door.question.prompt)}</p>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3" id="options-group">
+                            ${door.question.options.map(opt => `
+                                <label class="flex items-center space-x-3 p-4 bg-white rounded-xl border-2 border-slate-200 hover:border-forest-500 cursor-pointer transition shadow-sm">
+                                    <input type="radio" name="challenge-option" value="${opt.id}" class="w-4 h-4 text-forest-600 focus:ring-forest-500">
+                                    <span class="font-medium text-slate-800">${this.formatFractions(opt.text)}</span>
+                                </label>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+
+                const feedbackBox = document.getElementById('feedback-box');
+                feedbackBox.className = "hidden mt-6 p-4 rounded-2xl text-sm transition-all duration-300";
+                feedbackBox.innerHTML = "";
+
+                const btnHint = document.getElementById('btn-hint');
+                if (this.state.hintsUsed[doorId]) {
+                    btnHint.classList.add('hidden');
+                } else {
+                    btnHint.classList.remove('hidden');
+                }
+
+                document.getElementById('btn-submit').disabled = false;
+                document.getElementById('btn-submit').classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+
+            formatFractions(text) {
+                return text.replace(/\{(\d+)\/(\d+)\}/g, (match, num, den) => {
+                    return `<span class="math-fraction"><span class="numerator">${num}</span><span class="denominator">${den}</span></span>`;
+                });
+            }
+
+            returnToMap() {
+                this.showMap();
+            }
+
+            showHint() {
+                const doorId = this.state.currentDoorId;
+                const door = GAME_CONFIG.doors.find(d => d.id === doorId);
+                if (!door) return;
+
+                this.state.hintsUsed[doorId] = true;
+                document.getElementById('btn-hint').classList.add('hidden');
+
+                const feedbackBox = document.getElementById('feedback-box');
+                feedbackBox.className = "mt-6 p-4 rounded-2xl text-sm bg-amber-50 border border-amber-300 text-amber-900";
+                feedbackBox.innerHTML = `<div class="flex items-start space-x-2"><i class="fa-solid fa-lightbulb text-amber-600 mt-1"></i><div><strong>Gợi ý:</strong> ${this.formatFractions(door.question.hint)}</div></div>`;
+            }
+
+            submitAnswer() {
+                const selectedEl = document.querySelector('input[name="challenge-option"]:checked');
+                if (!selectedEl) {
+                    alert("Vui lòng chọn một đáp án trước khi nộp bài!");
+                    return;
+                }
+
+                const selectedId = selectedEl.value;
+                const doorId = this.state.currentDoorId;
+                const door = GAME_CONFIG.doors.find(d => d.id === doorId);
+                const feedbackBox = document.getElementById('feedback-box');
+
+                const isCorrect = selectedId === door.question.correct;
+                const selectedOpt = door.question.options.find(o => o.id === selectedId);
+
+                // Save log
+                this.state.doorLogs[doorId] = {
+                    question: door.question.prompt,
+                    selected: selectedOpt ? selectedOpt.text : selectedId,
+                    isCorrect: isCorrect,
+                    attempts: (this.state.attempts[doorId] || 0) + 1,
+                    hintUsed: this.state.hintsUsed[doorId],
+                    timestamp: new Date().toLocaleTimeString()
+                };
+
+                if (isCorrect) {
+                    let score = 20;
+                    if (this.state.hintsUsed[doorId] || (this.state.attempts[doorId] > 0)) {
+                        score = 15; // Point deduction for hint or error
+                    }
+                    this.state.scores[doorId] = score;
+
+                    if (!this.state.completedDoors.includes(doorId)) {
+                        this.state.completedDoors.push(doorId);
+                    }
+
+                    feedbackBox.className = "mt-6 p-4 rounded-2xl text-sm bg-emerald-50 border border-emerald-300 text-emerald-900";
+                    feedbackBox.innerHTML = `<div class="flex items-start space-x-2"><i class="fa-solid fa-circle-check text-emerald-600 mt-1 text-lg"></i><div><strong>Chính xác! (+${score} điểm)</strong><p class="mt-1">${this.formatFractions(door.question.explanation)}</p></div></div>`;
+
+                    document.getElementById('btn-submit').disabled = true;
+                    document.getElementById('btn-submit').classList.add('opacity-50', 'cursor-not-allowed');
+
+                    // Trigger confetti celebration
+                    confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } });
+
+                    setTimeout(() => {
+                        this.showMap();
+                    }, 2500);
+
+                } else {
+                    this.state.attempts[doorId] = (this.state.attempts[doorId] || 0) + 1;
+                    feedbackBox.className = "mt-6 p-4 rounded-2xl text-sm bg-red-50 border border-red-300 text-red-900";
+                    feedbackBox.innerHTML = `<div class="flex items-start space-x-2"><i class="fa-solid fa-circle-xmark text-red-600 mt-1 text-lg"></i><div><strong>Chưa chính xác!</strong> Hãy đọc kỹ gợi ý và thử lại nhé.</div></div>`;
+                    document.getElementById('btn-hint').classList.remove('hidden');
+                }
+            }
+
+            openFinalTreasure() {
+                if (this.state.timerInterval) clearInterval(this.state.timerInterval);
+
+                this.hideAllViews();
+                document.getElementById('view-celebration').classList.remove('hidden');
+
+                const totalScore = Object.values(this.state.scores).reduce((a, b) => a + b, 0);
+                const totalHints = Object.values(this.state.hintsUsed).filter(Boolean).length;
+                const totalErrors = Object.values(this.state.attempts).reduce((a, b) => a + (b > 1 ? b - 1 : (b === 1 && !this.state.completedDoors.includes(Number(Object.keys(this.state.attempts).find(k => this.state.attempts[k] === b))) ? 1 : 0)), 0);
+
+                const minutes = Math.floor(this.state.elapsedSeconds / 60).toString().padStart(2, '0');
+                const seconds = (this.state.elapsedSeconds % 60).toString().padStart(2, '0');
+                const timeStr = `${minutes}:${seconds}`;
+
+                document.getElementById('celeb-score').innerText = `${totalScore}/100`;
+                document.getElementById('celeb-time').innerText = timeStr;
+                document.getElementById('celeb-hints').innerText = totalHints;
+                document.getElementById('celeb-errors').innerText = totalErrors;
+
+                // Save result record to localStorage for Teacher Dashboard
+                this.saveStudentRecord({
+                    id: 'student_' + Date.now(),
+                    name: this.state.studentName,
+                    className: this.state.studentClass,
+                    score: totalScore,
+                    completedCount: this.state.completedDoors.length,
+                    hints: totalHints,
+                    errors: totalErrors,
+                    time: timeStr,
+                    status: 'completed',
+                    date: new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString(),
+                    logs: this.state.doorLogs
+                });
+
+                // Big Confetti burst
+                const duration = 3 * 1000;
+                const animationEnd = Date.now() + duration;
+                const interval = setInterval(function() {
+                    if (Date.now() > animationEnd) {
+                        return clearInterval(interval);
+                    }
+                    confetti({ startVelocity: 30, spread: 360, ticks: 60, origin: { x: Math.random(), y: Math.random() - 0.2 } });
+                }, 250);
+            }
+
+            saveStudentRecord(record) {
+                let records = JSON.parse(localStorage.getItem('fraction_treasure_records') || '[]');
+                // Check if student already exists in this session, update or push
+                const existingIdx = records.findIndex(r => r.name.toLowerCase() === record.name.toLowerCase() && r.className.toLowerCase() === record.className.toLowerCase());
+                if (existingIdx >= 0) {
+                    records[existingIdx] = record;
+                } else {
+                    records.push(record);
+                }
+                localStorage.setItem('fraction_treasure_records', JSON.stringify(records));
+            }
+
+            hideAllViews() {
+                document.getElementById('view-welcome').classList.add('hidden');
+                document.getElementById('view-map').classList.add('hidden');
+                document.getElementById('view-challenge').classList.add('hidden');
+                document.getElementById('view-celebration').classList.add('hidden');
+            }
+
+            openTeacherLoginModal() {
+                document.getElementById('modal-teacher-login').classList.remove('hidden');
+                document.getElementById('teacher-password-input').value = '';
+                document.getElementById('teacher-login-error').classList.add('hidden');
+            }
+
+            closeTeacherLoginModal() {
+                document.getElementById('modal-teacher-login').classList.add('hidden');
+            }
+
+            verifyTeacherPassword(e) {
+                e.preventDefault();
+                const pwd = document.getElementById('teacher-password-input').value;
+                if (pwd === '123456') {
+                    this.closeTeacherLoginModal();
+                    this.openTeacherDashboard();
+                } else {
+                    const errEl = document.getElementById('teacher-login-error');
+                    errEl.innerText = "Mật khẩu không chính xác! (Mặc định: 123456)";
+                    errEl.classList.remove('hidden');
+                }
+            }
+
+            openTeacherDashboard() {
+                document.getElementById('view-teacher-dashboard').classList.remove('hidden');
+                teacherDashboard.init();
+            }
+
+            closeTeacherDashboard() {
+                document.getElementById('view-teacher-dashboard').classList.add('hidden');
+            }
+        }
+
+        class TeacherDashboardManager {
+            constructor() {
+                this.records = [];
+                this.filteredRecords = [];
+                this.sortField = 'score';
+                this.sortAsc = false;
+            }
+
+            init() {
+                this.loadData();
+                this.populateClassFilter();
+                this.filterData();
+                this.updateStats();
+            }
+
+            loadData() {
+                this.records = JSON.parse(localStorage.getItem('fraction_treasure_records') || '[]');
+            }
+
+            populateClassFilter() {
+                const classSelect = document.getElementById('teacher-filter-class');
+                const classes = [...new Set(this.records.map(r => r.className))];
+                
+                classSelect.innerHTML = '<option value="">Tất cả các lớp</option>';
+                classes.forEach(cls => {
+                    classSelect.innerHTML += `<option value="${cls}">${cls}</option>`;
+                });
+            }
+
+            filterData() {
+                this.loadData();
+                const searchTxt = document.getElementById('teacher-search').value.toLowerCase();
+                const classFilter = document.getElementById('teacher-filter-class').value;
+                const statusFilter = document.getElementById('teacher-filter-status').value;
+
+                this.filteredRecords = this.records.filter(r => {
+                    const matchName = r.name.toLowerCase().includes(searchTxt);
+                    const matchClass = classFilter === "" || r.className === classFilter;
+                    const matchStatus = statusFilter === "" || r.status === statusFilter;
+                    return matchName && matchClass && matchStatus;
+                });
+
+                this.sortRecords();
+                this.renderTable();
+            }
+
+            sortData(field) {
+                if (this.sortField === field) {
+                    this.sortAsc = !this.sortAsc;
+                } else {
+                    this.sortField = field;
+                    this.sortAsc = field === 'name' || field === 'className';
+                }
+                this.sortRecords();
+                this.renderTable();
+            }
+
+            sortRecords() {
+                this.filteredRecords.sort((a, b) => {
+                    let valA = a[this.sortField];
+                    let valB = b[this.sortField];
+
+                    if (typeof valA === 'string') {
+                        valA = valA.toLowerCase();
+                        valB = valB.toLowerCase();
+                    }
+
+                    if (valA < valB) return this.sortAsc ? -1 : 1;
+                    if (valA > valB) return this.sortAsc ? 1 : -1;
+                    return 0;
+                });
+            }
+
+            renderTable() {
+                const tbody = document.getElementById('teacher-table-body');
+                const emptyState = document.getElementById('teacher-empty-state');
+                tbody.innerHTML = '';
+
+                if (this.filteredRecords.length === 0) {
+                    emptyState.classList.remove('hidden');
+                    return;
+                }
+                emptyState.classList.add('hidden');
+
+                this.filteredRecords.forEach((r) => {
+                    const tr = document.createElement('tr');
+                    tr.className = "hover:bg-slate-50 transition border-b border-slate-100";
+                    
+                    const statusBadge = r.status === 'completed' 
+                        ? `<span class="bg-emerald-100 text-emerald-800 text-xs font-bold px-2.5 py-1 rounded-full">Hoàn thành</span>`
+                        : `<span class="bg-amber-100 text-amber-800 text-xs font-bold px-2.5 py-1 rounded-full">Đang làm</span>`;
+
+                    tr.innerHTML = `
+                        <td class="p-4 font-semibold text-slate-800">${r.name}</td>
+                        <td class="p-4"><span class="bg-slate-100 px-2 py-1 rounded text-xs font-medium text-slate-700">${r.className}</span></td>
+                        <td class="p-4 text-center font-display font-bold text-amber-600">${r.score}/100</td>
+                        <td class="p-4 text-center"><span class="font-bold text-forest-700">${r.completedCount}/5</span></td>
+                        <td class="p-4 text-center text-slate-600"><span class="text-amber-600 font-bold">${r.hints}</span> / <span class="text-red-600 font-bold">${r.errors}</span></td>
+                        <td class="p-4 text-center text-slate-600">${r.time}</td>
+                        <td class="p-4 text-center">${statusBadge}</td>
+                        <td class="p-4 text-center">
+                            <button onclick="teacherDashboard.viewStudentDetail('${r.id}')" class="bg-blue-50 hover:bg-blue-100 text-blue-600 p-2 rounded-xl transition text-sm" title="Xem chi tiết bài làm">
+                                <i class="fa-solid fa-eye"></i>
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+
+            updateStats() {
+                const totalStudents = this.records.length;
+                const completedCount = this.records.filter(r => r.status === 'completed').length;
+                
+                let avgScore = 0;
+                if (totalStudents > 0) {
+                    const sum = this.records.reduce((acc, curr) => acc + curr.score, 0);
+                    avgScore = Math.round(sum / totalStudents);
+                }
+
+                document.getElementById('stat-total-students').innerText = totalStudents;
+                document.getElementById('stat-completed-students').innerText = completedCount;
+                document.getElementById('stat-avg-score').innerText = avgScore;
+            }
+
+            viewStudentDetail(recordId) {
+                const record = this.records.find(r => r.id === recordId);
+                if (!record) return;
+
+                document.getElementById('detail-modal-title').innerText = `Bài làm của: ${record.name}`;
+                document.getElementById('detail-modal-subtitle').innerText = `Lớp: ${record.className} • Ngày nộp: ${record.date} • Tổng điểm: ${record.score}/100`;
+
+                const container = document.getElementById('detail-modal-content');
+                container.innerHTML = '';
+
+                GAME_CONFIG.doors.forEach(door => {
+                    const log = record.logs[door.id];
+                    let logHtml = "";
+                    if (log) {
+                        const statusColor = log.isCorrect ? 'text-emerald-600 bg-emerald-50 border-emerald-200' : 'text-red-600 bg-red-50 border-red-200';
+                        const icon = log.isCorrect ? '<i class="fa-solid fa-circle-check text-emerald-600 mr-1"></i> Đúng' : '<i class="fa-solid fa-circle-xmark text-red-600 mr-1"></i> Sai';
+                        
+                        logHtml = `
+                            <div class="border border-slate-200 rounded-2xl p-4 bg-white shadow-sm space-y-2">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-xs font-bold uppercase tracking-wider text-forest-700">Cửa ${door.id}: ${door.title.split(': ')[1]}</span>
+                                    <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full border ${statusColor}">${icon}</span>
+                                </div>
+                                <p class="text-xs text-slate-600 font-medium">${appController.formatFractions(log.question)}</p>
+                                <div class="text-xs bg-slate-50 p-2 rounded-xl flex flex-wrap justify-between gap-2 text-slate-700">
+                                    <span>Đáp án chọn: <strong class="text-slate-900">${appController.formatFractions(log.selected)}</strong></span>
+                                    <span>Số lần thử: <strong>${log.attempts}</strong></span>
+                                    <span>Dùng gợi ý: <strong>${log.hintUsed ? 'Có' : 'Không'}</strong></span>
+                                    <span class="text-slate-400">${log.timestamp}</span>
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        logHtml = `
+                            <div class="border border-slate-200 rounded-2xl p-4 bg-slate-50 text-slate-400 text-xs">
+                                <span class="font-bold text-slate-600">Cửa ${door.id}:</span> Học sinh chưa hoàn thành cánh cửa này.
+                            </div>
+                        `;
+                    }
+                    container.innerHTML += logHtml;
+                });
+
+                document.getElementById('modal-student-detail').classList.remove('hidden');
+            }
+
+            closeStudentDetail() {
+                document.getElementById('modal-student-detail').classList.add('hidden');
+            }
+
+            exportCSV() {
+                if (this.records.length === 0) {
+                    alert("Không có dữ liệu để xuất tệp CSV.");
+                    return;
+                }
+
+                let csvContent = "\uFEFFHọ và tên,Lớp,Tổng điểm,Cửa hoàn thành,Số lần dùng gợi ý,Số lần trả lời sai,Thời gian hoàn thành,Trạng thái,Thời gian nộp\n";
+                this.records.forEach(r => {
+                    csvContent += `"${r.name}","${r.className}",${r.score},${r.completedCount}/5,${r.hints},${r.errors},"${r.time}","${r.status === 'completed' ? 'Hoàn thành' : 'Đang làm'}","${r.date}"\n`;
+                });
+
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `Ket_Qua_Truy_Tim_Kho_Bau_Phan_So_${new Date().toISOString().slice(0,10)}.csv`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            }
+
+            clearDataConfirm() {
+                if (confirm("Bạn có chắc chắn muốn xóa toàn bộ dữ liệu kết quả học sinh không? Thao tác này không thể hoàn tác.")) {
+                    localStorage.removeItem('fraction_treasure_records');
+                    this.records = [];
+                    this.filterData();
+                    this.updateStats();
+                    this.populateClassFilter();
+                }
+            }
+        }
+
+        const appController = new GameController();
+        const teacherDashboard = new TeacherDashboardManager();
+
+        window.onload = function() {
+            appController.init();
+        };
+    </script>
+</body>
+</html>
